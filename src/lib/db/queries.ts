@@ -18,17 +18,22 @@ export async function getOrCreateUserSessionRow(
   }
 
   const { data: newUser, error } = await supabase
-    .from("users")
-    .insert({
-      clerk_id: clerkId,
-      email,
-    })
-    .select()
-    .single();
+  .from("users")
+  .insert({
+    clerk_id: clerkId,
+    email,
+  })
+  .select()
+  .single();
 
-  if (error || !newUser) {
-    throw new Error("Failed to create user record");
-  }
+if (error) {
+  console.error("SUPABASE ERROR:", error);
+  throw new Error(error.message);
+}
 
-  return newUser as UserRow;
+if (!newUser) {
+  throw new Error("No user returned from insert");
+}
+
+return newUser as UserRow;
 }
