@@ -1,3 +1,4 @@
+import DeletePetButton from "@/components/buttons/DeletePetButton";
 import { auth, currentUser } from "@clerk/nextjs/server";
 import {
   getOrCreateUserSessionRow,
@@ -89,6 +90,8 @@ export default async function PetsPage() {
                     Weight: {pet.weight_kg} kg
                   </p>
                 )}
+
+                <DeletePetButton petId={pet.id} />
               </div>
             ))
           )}
