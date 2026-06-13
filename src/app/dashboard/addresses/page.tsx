@@ -1,3 +1,4 @@
+import DeleteAddressButton from "@/components/buttons/DeleteAddressButton";
 import { auth, currentUser } from "@clerk/nextjs/server";
 import {
   getOrCreateUserSessionRow,
@@ -91,10 +92,14 @@ export default async function AddressesPage() {
                 </p>
 
                 {address.is_default && (
-                  <span className="inline-block mt-2 rounded bg-green-100 px-2 py-1 text-xs text-green-700">
+                  <span className="inline-block mt-2 px-2 py-1 rounded bg-green-100 text-xs text-green-700">
                     Default Address
                   </span>
                 )}
+
+                <DeleteAddressButton
+                  addressId={address.id}
+                />
               </div>
             ))
           )}

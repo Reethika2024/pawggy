@@ -81,3 +81,59 @@ export async function appendUserAddressRow(formData: unknown) {
     };
   }
 }
+export async function removeUserAddressRow(addressId: string) {
+  try {
+    const { userId: clerkId } = await auth();
+
+    if (!clerkId) {
+      return {
+        success: false,
+        error: "Unauthorized access detected.",
+      };
+    }
+
+    const supabase = await createSupabaseServerClient();
+
+    const { data: userRow, error: userError } = await supabase
+      .from("users")
+      .select("id")
+      .eq("clerk_id", clerkId)
+      .single();
+
+    if (userError || !userRow) {
+      return {
+        success: false,
+        error: "Internal reference verification failed.",
+      };
+    }
+
+    const { error: deleteError } = await supabase
+      .from("user_addresses")
+      .delete()
+      .eq("id", addressId)
+      .eq("user_id", userRow.id);
+
+    if (deleteError) {
+      return {
+        success: false,
+        error: deleteError.message,
+      };
+    }
+
+    revalidatePath("/dashboard/addresses");
+
+    return {
+      success: true,
+    };
+  } catch (err) {
+    const message =
+      err instanceof Error
+        ? err.message
+        : "An unexpected server error occurred.";
+
+    return {
+      success: false,
+      error: message,
+    };
+  }
+}
