@@ -126,3 +126,82 @@ export async function removePetProfileRecord(petId: string) {
     };
   }
 }
+export async function updatePetProfileRecord(
+  petId: string,
+  formData: unknown
+) {
+  const { userId } = await auth();
+
+  if (!userId) {
+    return {
+      success: false,
+      error: "Unauthorized",
+    };
+  }
+
+  const clerkUser = await currentUser();
+
+  const userEmail =
+    clerkUser?.primaryEmailAddress?.emailAddress ??
+    clerkUser?.emailAddresses?.[0]?.emailAddress;
+
+  if (!userEmail) {
+    return {
+      success: false,
+      error: "User email not found",
+    };
+  }
+
+  const parsed = petFormSchema.safeParse(formData);
+
+  if (!parsed.success) {
+    return {
+      success: false,
+      error: parsed.error.issues[0]?.message,
+    };
+  }
+
+  try {
+    const dbUser = await getOrCreateUserSessionRow(
+      userId,
+      userEmail
+    );
+
+    const supabase = await createSupabaseServerClient();
+
+    const { error } = await supabase
+      .from("pets")
+      .update({
+        name: parsed.data.name,
+        species: parsed.data.species,
+        breed: parsed.data.breed || null,
+        age_months: parsed.data.age_months,
+        weight_kg: parsed.data.weight_kg,
+      })
+      .eq("id", petId)
+      .eq("owner_id", dbUser.id);
+
+    if (error) {
+      return {
+        success: false,
+        error: error.message,
+      };
+    }
+
+    revalidatePath("/dashboard/pets");
+
+    return {
+      success: true,
+    };
+  } catch (err) {
+    const message =
+      err instanceof Error
+        ? err.message
+        : "Failed to update pet profile";
+
+    return {
+      success: false,
+      error: message,
+    };
+  }
+}

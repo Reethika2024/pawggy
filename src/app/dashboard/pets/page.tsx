@@ -1,3 +1,4 @@
+import EditPetButton from "@/components/buttons/EditPetButton";
 import DeletePetButton from "@/components/buttons/DeletePetButton";
 import { auth, currentUser } from "@clerk/nextjs/server";
 import {
@@ -79,19 +80,22 @@ export default async function PetsPage() {
                   {pet.breed ? ` • ${pet.breed}` : ""}
                 </p>
 
-                {pet.age_months && (
+                {pet.age_months !== null && (
                   <p className="text-xs text-slate-500 mt-1">
                     Age: {pet.age_months} months
                   </p>
                 )}
 
-                {pet.weight_kg && (
+                {pet.weight_kg !== null && (
                   <p className="text-xs text-slate-500">
                     Weight: {pet.weight_kg} kg
                   </p>
                 )}
 
-                <DeletePetButton petId={pet.id} />
+                <div className="flex items-center gap-4 mt-3">
+                  <EditPetButton pet={pet} />
+                  <DeletePetButton petId={pet.id} />
+                </div>
               </div>
             ))
           )}
