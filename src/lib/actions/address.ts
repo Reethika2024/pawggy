@@ -81,6 +81,7 @@ export async function appendUserAddressRow(formData: unknown) {
     };
   }
 }
+
 export async function removeUserAddressRow(addressId: string) {
   try {
     const { userId: clerkId } = await auth();
@@ -130,6 +131,95 @@ export async function removeUserAddressRow(addressId: string) {
       err instanceof Error
         ? err.message
         : "An unexpected server error occurred.";
+
+    return {
+      success: false,
+      error: message,
+    };
+  }
+}
+
+export async function updateUserAddressRow(
+  addressId: string,
+  formData: unknown
+) {
+  const { userId } = await auth();
+
+  if (!userId) {
+    return {
+      success: false,
+      error: "Unauthorized",
+    };
+  }
+
+  const clerkUser = await currentUser();
+
+  const userEmail =
+    clerkUser?.primaryEmailAddress?.emailAddress ??
+    clerkUser?.emailAddresses?.[0]?.emailAddress;
+
+  if (!userEmail) {
+    return {
+      success: false,
+      error: "User email not found",
+    };
+  }
+
+  const parsed = addressFormSchema.safeParse(formData);
+
+  if (!parsed.success) {
+    return {
+      success: false,
+      error: parsed.error.issues[0]?.message,
+    };
+  }
+
+  try {
+    const dbUser = await getOrCreateUserSessionRow(
+      userId,
+      userEmail
+    );
+
+    const supabase = await createSupabaseServerClient();
+
+    if (parsed.data.is_default) {
+      await supabase
+        .from("user_addresses")
+        .update({ is_default: false })
+        .eq("user_id", dbUser.id);
+    }
+
+    const { error } = await supabase
+      .from("user_addresses")
+      .update({
+        label: parsed.data.label,
+        street_address: parsed.data.street_address,
+        landmark: parsed.data.landmark || null,
+        city: parsed.data.city,
+        state: parsed.data.state,
+        postal_code: parsed.data.postal_code,
+        is_default: parsed.data.is_default,
+      })
+      .eq("id", addressId)
+      .eq("user_id", dbUser.id);
+
+    if (error) {
+      return {
+        success: false,
+        error: error.message,
+      };
+    }
+
+    revalidatePath("/dashboard/addresses");
+
+    return {
+      success: true,
+    };
+  } catch (err) {
+    const message =
+      err instanceof Error
+        ? err.message
+        : "Failed to update address";
 
     return {
       success: false,

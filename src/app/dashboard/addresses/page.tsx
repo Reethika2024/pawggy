@@ -1,9 +1,11 @@
+import EditAddressButton from "@/components/buttons/EditAddressButton";
 import DeleteAddressButton from "@/components/buttons/DeleteAddressButton";
 import { auth, currentUser } from "@clerk/nextjs/server";
 import {
   getOrCreateUserSessionRow,
   getUserAddresses,
 } from "@/lib/db/queries";
+import { UserAddressRow } from "@/types";
 import AddressForm from "@/components/forms/AddressForm";
 import { redirect } from "next/navigation";
 
@@ -26,7 +28,7 @@ export default async function AddressesPage() {
     redirect("/sign-in");
   }
 
-  let addresses: any[] = [];
+  let addresses: UserAddressRow[] = [];
 
   try {
     const dbUser = await getOrCreateUserSessionRow(
@@ -34,9 +36,13 @@ export default async function AddressesPage() {
       userEmail
     );
 
-    addresses = await getUserAddresses(dbUser.id);
+    addresses =
+      (await getUserAddresses(dbUser.id)) ?? [];
   } catch (error) {
-    console.error("Failed to load addresses:", error);
+    console.error(
+      "Failed to load addresses:",
+      error
+    );
   }
 
   return (
@@ -97,9 +103,15 @@ export default async function AddressesPage() {
                   </span>
                 )}
 
-                <DeleteAddressButton
-                  addressId={address.id}
-                />
+                <div className="flex gap-4 mt-3">
+                  <EditAddressButton
+                    address={address}
+                  />
+
+                  <DeleteAddressButton
+                    addressId={address.id}
+                  />
+                </div>
               </div>
             ))
           )}
