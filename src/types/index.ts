@@ -44,4 +44,12 @@ export interface BookingRow {
   booking_date: string;
   status: string;
   created_at: string;
+
+  pets?: {
+    name: string;
+  };
+
+  user_addresses?: {
+    label: string;
+  };
 }

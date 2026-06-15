@@ -70,6 +70,7 @@ export async function getUserAddresses(userId: string) {
 
   return data ?? [];
 }
+
 export async function getUserBookings(
   userId: string
 ) {
@@ -79,7 +80,15 @@ export async function getUserBookings(
   const { data, error } =
     await supabase
       .from("bookings")
-      .select("*")
+      .select(`
+        *,
+        pets (
+          name
+        ),
+        user_addresses (
+          label
+        )
+      `)
       .eq("user_id", userId)
       .order("created_at", {
         ascending: false,

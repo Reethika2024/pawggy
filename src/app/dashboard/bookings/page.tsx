@@ -26,8 +26,10 @@ export default async function BookingsPage() {
   const clerkUser = await currentUser();
 
   const userEmail =
-    clerkUser?.primaryEmailAddress?.emailAddress ??
-    clerkUser?.emailAddresses?.[0]?.emailAddress;
+    clerkUser?.primaryEmailAddress
+      ?.emailAddress ??
+    clerkUser?.emailAddresses?.[0]
+      ?.emailAddress;
 
   if (!userEmail) {
     redirect("/sign-in");
@@ -38,19 +40,25 @@ export default async function BookingsPage() {
   let bookings: BookingRow[] = [];
 
   try {
-    const dbUser = await getOrCreateUserSessionRow(
-      userId,
-      userEmail
-    );
+    const dbUser =
+      await getOrCreateUserSessionRow(
+        userId,
+        userEmail
+      );
 
     pets =
-      (await getUserPets(dbUser.id)) ?? [];
+      (await getUserPets(dbUser.id)) ??
+      [];
 
     addresses =
-      (await getUserAddresses(dbUser.id)) ?? [];
+      (await getUserAddresses(
+        dbUser.id
+      )) ?? [];
 
     bookings =
-      (await getUserBookings(dbUser.id)) ?? [];
+      (await getUserBookings(
+        dbUser.id
+      )) ?? [];
   } catch (error) {
     console.error(error);
   }
@@ -86,8 +94,22 @@ export default async function BookingsPage() {
             bookings.map((booking) => (
               <div
                 key={booking.id}
-                className="rounded-lg border p-4"
+                className="rounded-lg border p-4 bg-white dark:bg-slate-900"
               >
+                <p>
+                  <strong>Pet:</strong>{" "}
+                  {booking.pets?.name ??
+                    "Unknown"}
+                </p>
+
+                <p>
+                  <strong>Address:</strong>{" "}
+                  {booking
+                    .user_addresses
+                    ?.label ??
+                    "Unknown"}
+                </p>
+
                 <p>
                   <strong>Service:</strong>{" "}
                   {booking.service_type}
@@ -95,7 +117,19 @@ export default async function BookingsPage() {
 
                 <p>
                   <strong>Date:</strong>{" "}
-                  {booking.booking_date}
+                  {new Date(
+                    booking.booking_date
+                  ).toLocaleString(
+                    "en-IN",
+                    {
+                      day: "numeric",
+                      month: "short",
+                      year: "numeric",
+                      hour: "numeric",
+                      minute:
+                        "2-digit",
+                    }
+                  )}
                 </p>
 
                 <p>
@@ -106,7 +140,9 @@ export default async function BookingsPage() {
                 {booking.status !==
                   "cancelled" && (
                   <CancelBookingButton
-                    bookingId={booking.id}
+                    bookingId={
+                      booking.id
+                    }
                   />
                 )}
               </div>
