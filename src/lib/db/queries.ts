@@ -87,6 +87,12 @@ export async function getUserBookings(
         ),
         user_addresses (
           label
+        ),
+        service_providers (
+          name,
+          provider_type,
+          city,
+          rating
         )
       `)
       .eq("user_id", userId)
@@ -101,6 +107,7 @@ export async function getUserBookings(
 
   return data ?? [];
 }
+
 export async function getServiceProviders() {
   const supabase =
     await createSupabaseServerClient();

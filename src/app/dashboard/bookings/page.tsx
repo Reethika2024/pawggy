@@ -7,11 +7,13 @@ import {
   getUserPets,
   getUserAddresses,
   getUserBookings,
+  getServiceProviders,
 } from "@/lib/db/queries";
 import {
   PetRow,
   UserAddressRow,
   BookingRow,
+  ServiceProviderRow,
 } from "@/types";
 import { redirect } from "next/navigation";
 
@@ -39,6 +41,7 @@ export default async function BookingsPage() {
   let pets: PetRow[] = [];
   let addresses: UserAddressRow[] = [];
   let bookings: BookingRow[] = [];
+  let providers: ServiceProviderRow[] = [];
 
   try {
     const dbUser =
@@ -55,6 +58,10 @@ export default async function BookingsPage() {
       (await getUserAddresses(
         dbUser.id
       )) ?? [];
+
+    providers =
+      (await getServiceProviders()) ??
+      [];
 
     bookings =
       (await getUserBookings(
@@ -80,6 +87,7 @@ export default async function BookingsPage() {
         <BookingForm
           pets={pets}
           addresses={addresses}
+          providers={providers}
         />
 
         <div className="space-y-3">
@@ -107,6 +115,23 @@ export default async function BookingsPage() {
                   <strong>Address:</strong>{" "}
                   {booking.user_addresses
                     ?.label ?? "Unknown"}
+                </p>
+
+                <p>
+                  <strong>Provider:</strong>{" "}
+                  {booking
+                    .service_providers
+                    ?.name ?? "Unknown"}
+                </p>
+
+                <p>
+                  <strong>
+                    Provider Type:
+                  </strong>{" "}
+                  {booking
+                    .service_providers
+                    ?.provider_type ??
+                    "Unknown"}
                 </p>
 
                 <p>

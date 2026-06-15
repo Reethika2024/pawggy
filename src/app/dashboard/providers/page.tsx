@@ -4,6 +4,7 @@ import {
 import {
   ServiceProviderRow,
 } from "@/types";
+import ProvidersList from "@/components/providers/ProvidersList";
 
 export const revalidate = 0;
 
@@ -25,47 +26,9 @@ export default async function ProvidersPage() {
           </p>
         </div>
 
-        {providers.length === 0 ? (
-          <div className="rounded-lg border p-4">
-            No providers found.
-          </div>
-        ) : (
-          providers.map(
-            (provider) => (
-              <div
-                key={provider.id}
-                className="rounded-lg border p-4 bg-white dark:bg-slate-900"
-              >
-                <h2 className="font-bold text-lg">
-                  {provider.name}
-                </h2>
-
-                <p>
-                  Type:{" "}
-                  {
-                    provider.provider_type
-                  }
-                </p>
-
-                <p>
-                  City: {provider.city}
-                </p>
-
-                <p>
-                  Rating: ⭐{" "}
-                  {provider.rating}
-                </p>
-
-                <p>
-                  Verified:{" "}
-                  {provider.is_verified
-                    ? "Yes"
-                    : "No"}
-                </p>
-              </div>
-            )
-          )
-        )}
+        <ProvidersList
+          providers={providers}
+        />
       </div>
     </div>
   );

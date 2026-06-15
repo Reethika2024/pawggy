@@ -40,6 +40,7 @@ export interface BookingRow {
   user_id: string;
   pet_id: string;
   address_id: string;
+  provider_id: string;
   service_type: string;
   booking_date: string;
   status: string;
@@ -52,7 +53,15 @@ export interface BookingRow {
   user_addresses?: {
     label: string;
   };
+
+  service_providers?: {
+    name: string;
+    provider_type: string;
+    city: string;
+    rating: number;
+  };
 }
+
 export interface ServiceProviderRow {
   id: string;
   name: string;

@@ -2,16 +2,22 @@
 
 import { useState } from "react";
 import { createBookingRecord } from "@/lib/actions/booking";
-import { PetRow, UserAddressRow } from "@/types";
+import {
+  PetRow,
+  UserAddressRow,
+  ServiceProviderRow,
+} from "@/types";
 
 interface BookingFormProps {
   pets: PetRow[];
   addresses: UserAddressRow[];
+  providers: ServiceProviderRow[];
 }
 
 export default function BookingForm({
   pets,
   addresses,
+  providers,
 }: BookingFormProps) {
   const [isSubmitting, setIsSubmitting] =
     useState(false);
@@ -29,6 +35,9 @@ export default function BookingForm({
 
     const result =
       await createBookingRecord({
+        provider_id: String(
+          formData.get("provider_id")
+        ),
         pet_id: String(
           formData.get("pet_id")
         ),
@@ -70,6 +79,34 @@ export default function BookingForm({
     >
       <div>
         <label className="block text-sm mb-1">
+          Provider
+        </label>
+
+        <select
+          name="provider_id"
+          className="w-full border rounded p-2"
+          required
+        >
+          <option value="">
+            Select Provider
+          </option>
+
+          {providers.map(
+            (provider) => (
+              <option
+                key={provider.id}
+                value={provider.id}
+              >
+                {provider.name} (
+                {provider.provider_type})
+              </option>
+            )
+          )}
+        </select>
+      </div>
+
+      <div>
+        <label className="block text-sm mb-1">
           Pet
         </label>
 
@@ -107,14 +144,16 @@ export default function BookingForm({
             Select Address
           </option>
 
-          {addresses.map((address) => (
-            <option
-              key={address.id}
-              value={address.id}
-            >
-              {address.label}
-            </option>
-          ))}
+          {addresses.map(
+            (address) => (
+              <option
+                key={address.id}
+                value={address.id}
+              >
+                {address.label}
+              </option>
+            )
+          )}
         </select>
       </div>
 
