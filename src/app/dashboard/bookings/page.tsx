@@ -1,4 +1,5 @@
 import CancelBookingButton from "@/components/buttons/CancelBookingButton";
+import UpdateBookingStatusButton from "@/components/buttons/UpdateBookingStatusButton";
 import BookingForm from "@/components/forms/BookingForm";
 import { auth, currentUser } from "@clerk/nextjs/server";
 import {
@@ -104,10 +105,8 @@ export default async function BookingsPage() {
 
                 <p>
                   <strong>Address:</strong>{" "}
-                  {booking
-                    .user_addresses
-                    ?.label ??
-                    "Unknown"}
+                  {booking.user_addresses
+                    ?.label ?? "Unknown"}
                 </p>
 
                 <p>
@@ -126,8 +125,7 @@ export default async function BookingsPage() {
                       month: "short",
                       year: "numeric",
                       hour: "numeric",
-                      minute:
-                        "2-digit",
+                      minute: "2-digit",
                     }
                   )}
                 </p>
@@ -137,14 +135,36 @@ export default async function BookingsPage() {
                   {booking.status}
                 </p>
 
-                {booking.status !==
-                  "cancelled" && (
-                  <CancelBookingButton
+                {booking.status ===
+                  "pending" && (
+                  <UpdateBookingStatusButton
                     bookingId={
                       booking.id
                     }
+                    nextStatus="confirmed"
                   />
                 )}
+
+                {booking.status ===
+                  "confirmed" && (
+                  <UpdateBookingStatusButton
+                    bookingId={
+                      booking.id
+                    }
+                    nextStatus="completed"
+                  />
+                )}
+
+                {booking.status !==
+                  "cancelled" &&
+                  booking.status !==
+                    "completed" && (
+                    <CancelBookingButton
+                      bookingId={
+                        booking.id
+                      }
+                    />
+                  )}
               </div>
             ))
           )}

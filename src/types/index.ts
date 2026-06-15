@@ -53,3 +53,14 @@ export interface BookingRow {
     label: string;
   };
 }
+export interface ServiceProviderRow {
+  id: string;
+  name: string;
+  email: string;
+  phone: string | null;
+  provider_type: string;
+  city: string;
+  rating: number;
+  is_verified: boolean;
+  created_at: string;
+}

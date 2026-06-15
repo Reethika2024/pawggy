@@ -40,8 +40,7 @@ export async function createBookingRecord(
     return {
       success: false,
       error:
-        parsed.error.issues[0]
-          ?.message,
+        parsed.error.issues[0]?.message,
     };
   }
 
@@ -60,8 +59,7 @@ export async function createBookingRecord(
         .from("bookings")
         .insert({
           user_id: dbUser.id,
-          pet_id:
-            parsed.data.pet_id,
+          pet_id: parsed.data.pet_id,
           address_id:
             parsed.data.address_id,
           service_type:
@@ -86,14 +84,12 @@ export async function createBookingRecord(
       success: true,
     };
   } catch (err) {
-    const message =
-      err instanceof Error
-        ? err.message
-        : "Failed to create booking";
-
     return {
       success: false,
-      error: message,
+      error:
+        err instanceof Error
+          ? err.message
+          : "Failed to create booking",
     };
   }
 }
@@ -167,6 +163,80 @@ export async function cancelBookingRecord(
         err instanceof Error
           ? err.message
           : "Failed to cancel booking",
+    };
+  }
+}
+
+export async function updateBookingStatusRecord(
+  bookingId: string,
+  status: "confirmed" | "completed"
+) {
+  try {
+    const { userId: clerkId } =
+      await auth();
+
+    if (!clerkId) {
+      return {
+        success: false,
+        error: "Unauthorized",
+      };
+    }
+
+    const supabase =
+      await createSupabaseServerClient();
+
+    const {
+      data: userRow,
+      error: userError,
+    } = await supabase
+      .from("users")
+      .select("id")
+      .eq("clerk_id", clerkId)
+      .single();
+
+    if (
+      userError ||
+      !userRow
+    ) {
+      return {
+        success: false,
+        error: "User not found",
+      };
+    }
+
+    const { error } =
+      await supabase
+        .from("bookings")
+        .update({
+          status,
+        })
+        .eq("id", bookingId)
+        .eq(
+          "user_id",
+          userRow.id
+        );
+
+    if (error) {
+      return {
+        success: false,
+        error: error.message,
+      };
+    }
+
+    revalidatePath(
+      "/dashboard/bookings"
+    );
+
+    return {
+      success: true,
+    };
+  } catch (err) {
+    return {
+      success: false,
+      error:
+        err instanceof Error
+          ? err.message
+          : "Failed to update booking",
     };
   }
 }
