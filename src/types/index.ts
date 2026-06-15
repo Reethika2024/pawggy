@@ -73,3 +73,12 @@ export interface ServiceProviderRow {
   is_verified: boolean;
   created_at: string;
 }
+export interface ReviewRow {
+  id: string;
+  booking_id: string;
+  provider_id: string;
+  user_id: string;
+  rating: number;
+  review: string | null;
+  created_at: string;
+}
