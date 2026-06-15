@@ -28,3 +28,15 @@ export const addressFormSchema = z.object({
   longitude: z.number().optional(),
   is_default: z.boolean().default(false),
 });
+export const bookingFormSchema = z.object({
+  pet_id: z.string().uuid("Select a pet"),
+  address_id: z.string().uuid("Select an address"),
+  service_type: z.string().min(
+    2,
+    "Service type is required"
+  ),
+  booking_date: z.string().min(
+    1,
+    "Booking date is required"
+  ),
+});

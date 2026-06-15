@@ -34,3 +34,14 @@ export interface UserAddressRow {
   is_default: boolean;
   created_at: string;
 }
+
+export interface BookingRow {
+  id: string;
+  user_id: string;
+  pet_id: string;
+  address_id: string;
+  service_type: string;
+  booking_date: string;
+  status: string;
+  created_at: string;
+}

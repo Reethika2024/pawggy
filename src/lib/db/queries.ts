@@ -70,3 +70,25 @@ export async function getUserAddresses(userId: string) {
 
   return data ?? [];
 }
+export async function getUserBookings(
+  userId: string
+) {
+  const supabase =
+    await createSupabaseServerClient();
+
+  const { data, error } =
+    await supabase
+      .from("bookings")
+      .select("*")
+      .eq("user_id", userId)
+      .order("created_at", {
+        ascending: false,
+      });
+
+  if (error) {
+    console.error(error);
+    return [];
+  }
+
+  return data ?? [];
+}
