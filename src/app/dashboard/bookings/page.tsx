@@ -1,9 +1,16 @@
+import BookingForm from "@/components/forms/BookingForm";
 import { auth, currentUser } from "@clerk/nextjs/server";
 import {
   getOrCreateUserSessionRow,
+  getUserPets,
+  getUserAddresses,
   getUserBookings,
 } from "@/lib/db/queries";
-import { BookingRow } from "@/types";
+import {
+  PetRow,
+  UserAddressRow,
+  BookingRow,
+} from "@/types";
 import { redirect } from "next/navigation";
 
 export const revalidate = 0;
@@ -25,24 +32,26 @@ export default async function BookingsPage() {
     redirect("/sign-in");
   }
 
+  let pets: PetRow[] = [];
+  let addresses: UserAddressRow[] = [];
   let bookings: BookingRow[] = [];
 
   try {
-    const dbUser =
-      await getOrCreateUserSessionRow(
-        userId,
-        userEmail
-      );
+    const dbUser = await getOrCreateUserSessionRow(
+      userId,
+      userEmail
+    );
+
+    pets =
+      (await getUserPets(dbUser.id)) ?? [];
+
+    addresses =
+      (await getUserAddresses(dbUser.id)) ?? [];
 
     bookings =
-      (await getUserBookings(
-        dbUser.id
-      )) ?? [];
+      (await getUserBookings(dbUser.id)) ?? [];
   } catch (error) {
-    console.error(
-      "Failed to load bookings:",
-      error
-    );
+    console.error(error);
   }
 
   return (
@@ -58,18 +67,19 @@ export default async function BookingsPage() {
           </p>
         </div>
 
-        <div className="rounded-lg border p-4">
-          Booking form coming next.
-        </div>
+        <BookingForm
+          pets={pets}
+          addresses={addresses}
+        />
 
         <div className="space-y-3">
           <h2 className="text-lg font-bold">
-            My Bookings
+            Existing Bookings
           </h2>
 
           {bookings.length === 0 ? (
             <div className="rounded-lg border p-4">
-              No bookings yet.
+              No bookings found.
             </div>
           ) : (
             bookings.map((booking) => (
@@ -78,10 +88,17 @@ export default async function BookingsPage() {
                 className="rounded-lg border p-4"
               >
                 <p>
+                  <strong>Service:</strong>{" "}
                   {booking.service_type}
                 </p>
 
-                <p className="text-sm text-slate-500">
+                <p>
+                  <strong>Date:</strong>{" "}
+                  {booking.booking_date}
+                </p>
+
+                <p>
+                  <strong>Status:</strong>{" "}
                   {booking.status}
                 </p>
               </div>
