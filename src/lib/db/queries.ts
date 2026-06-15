@@ -101,3 +101,22 @@ export async function getUserBookings(
 
   return data ?? [];
 }
+export async function getServiceProviders() {
+  const supabase =
+    await createSupabaseServerClient();
+
+  const { data, error } =
+    await supabase
+      .from("service_providers")
+      .select("*")
+      .order("rating", {
+        ascending: false,
+      });
+
+  if (error) {
+    console.error(error);
+    return [];
+  }
+
+  return data ?? [];
+}
