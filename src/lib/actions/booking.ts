@@ -97,3 +97,76 @@ export async function createBookingRecord(
     };
   }
 }
+
+export async function cancelBookingRecord(
+  bookingId: string
+) {
+  try {
+    const { userId: clerkId } =
+      await auth();
+
+    if (!clerkId) {
+      return {
+        success: false,
+        error: "Unauthorized",
+      };
+    }
+
+    const supabase =
+      await createSupabaseServerClient();
+
+    const {
+      data: userRow,
+      error: userError,
+    } = await supabase
+      .from("users")
+      .select("id")
+      .eq("clerk_id", clerkId)
+      .single();
+
+    if (
+      userError ||
+      !userRow
+    ) {
+      return {
+        success: false,
+        error: "User not found",
+      };
+    }
+
+    const { error } =
+      await supabase
+        .from("bookings")
+        .update({
+          status: "cancelled",
+        })
+        .eq("id", bookingId)
+        .eq(
+          "user_id",
+          userRow.id
+        );
+
+    if (error) {
+      return {
+        success: false,
+        error: error.message,
+      };
+    }
+
+    revalidatePath(
+      "/dashboard/bookings"
+    );
+
+    return {
+      success: true,
+    };
+  } catch (err) {
+    return {
+      success: false,
+      error:
+        err instanceof Error
+          ? err.message
+          : "Failed to cancel booking",
+    };
+  }
+}

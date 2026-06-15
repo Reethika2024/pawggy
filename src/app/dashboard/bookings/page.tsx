@@ -1,3 +1,4 @@
+import CancelBookingButton from "@/components/buttons/CancelBookingButton";
 import BookingForm from "@/components/forms/BookingForm";
 import { auth, currentUser } from "@clerk/nextjs/server";
 import {
@@ -101,6 +102,13 @@ export default async function BookingsPage() {
                   <strong>Status:</strong>{" "}
                   {booking.status}
                 </p>
+
+                {booking.status !==
+                  "cancelled" && (
+                  <CancelBookingButton
+                    bookingId={booking.id}
+                  />
+                )}
               </div>
             ))
           )}
