@@ -20,11 +20,15 @@ function createBookingDateTime(
 ) {
   const dateMatch = dateText
     .trim()
-    .match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+    .match(
+      /^(\d{1,2})\/(\d{1,2})\/(\d{4})$/
+    );
 
   const timeMatch = timeText
     .trim()
-    .match(/^([01]?\d|2[0-3]):([0-5]\d)$/);
+    .match(
+      /^([01]?\d|2[0-3]):([0-5]\d)$/
+    );
 
   if (!dateMatch || !timeMatch) {
     return null;
@@ -47,7 +51,6 @@ function createBookingDateTime(
     0
   );
 
-  // Prevent invalid dates such as 31/02/2026.
   if (
     date.getFullYear() !== year ||
     date.getMonth() !== month - 1 ||
@@ -58,7 +61,6 @@ function createBookingDateTime(
     return null;
   }
 
-  // Do not allow bookings in the past.
   if (date.getTime() < Date.now()) {
     return null;
   }
@@ -149,21 +151,22 @@ export default function BookingForm({
   return (
     <form
       action={handleSubmit}
-      className="space-y-4 rounded-lg border p-4"
+      className="space-y-7"
     >
-      {/* Provider */}
+      {/* PROVIDER */}
       <div>
-        <label className="block text-sm mb-1">
-          Provider
-        </label>
+        <FieldLabel
+          title="Service Provider"
+          hint="Choose who will provide the care"
+        />
 
         <select
           name="provider_id"
-          className="w-full border rounded p-2"
+          className="mt-3 w-full rounded-2xl border border-white/10 bg-slate-950 px-4 py-3.5 text-white outline-none transition focus:border-white/30"
           required
         >
           <option value="">
-            Select Provider
+            Select a provider
           </option>
 
           {providers.map((provider) => (
@@ -171,26 +174,27 @@ export default function BookingForm({
               key={provider.id}
               value={provider.id}
             >
-              {provider.name} (
-              {provider.provider_type})
+              {provider.name} —{" "}
+              {provider.provider_type}
             </option>
           ))}
         </select>
       </div>
 
-      {/* Pet */}
+      {/* PET */}
       <div>
-        <label className="block text-sm mb-1">
-          Pet
-        </label>
+        <FieldLabel
+          title="Your Pet"
+          hint="Who is receiving the service?"
+        />
 
         <select
           name="pet_id"
-          className="w-full border rounded p-2"
+          className="mt-3 w-full rounded-2xl border border-white/10 bg-slate-950 px-4 py-3.5 text-white outline-none transition focus:border-white/30"
           required
         >
           <option value="">
-            Select Pet
+            Select your pet
           </option>
 
           {pets.map((pet) => (
@@ -202,21 +206,28 @@ export default function BookingForm({
             </option>
           ))}
         </select>
+
+        {pets.length === 0 && (
+          <p className="mt-2 text-xs text-amber-300">
+            Add a pet before creating a booking.
+          </p>
+        )}
       </div>
 
-      {/* Address */}
+      {/* ADDRESS */}
       <div>
-        <label className="block text-sm mb-1">
-          Address
-        </label>
+        <FieldLabel
+          title="Service Address"
+          hint="Where should the service happen?"
+        />
 
         <select
           name="address_id"
-          className="w-full border rounded p-2"
+          className="mt-3 w-full rounded-2xl border border-white/10 bg-slate-950 px-4 py-3.5 text-white outline-none transition focus:border-white/30"
           required
         >
           <option value="">
-            Select Address
+            Select an address
           </option>
 
           {addresses.map((address) => (
@@ -228,110 +239,151 @@ export default function BookingForm({
             </option>
           ))}
         </select>
+
+        {addresses.length === 0 && (
+          <p className="mt-2 text-xs text-amber-300">
+            Add an address before creating a booking.
+          </p>
+        )}
       </div>
 
-      {/* Service */}
+      {/* SERVICE */}
       <div>
-        <label className="block text-sm mb-1">
-          Service Type
-        </label>
+        <FieldLabel
+          title="Service"
+          hint="What does your pet need?"
+        />
 
         <select
           name="service_type"
-          className="w-full border rounded p-2"
+          className="mt-3 w-full rounded-2xl border border-white/10 bg-slate-950 px-4 py-3.5 text-white outline-none transition focus:border-white/30"
           required
         >
           <option value="">
-            Select Service
+            Select a service
           </option>
 
           <option value="Grooming">
-            Grooming
+            ✂️ Grooming
           </option>
 
           <option value="Vet Visit">
-            Vet Visit
+            🩺 Vet Visit
           </option>
 
           <option value="Boarding">
-            Boarding
+            🏠 Boarding
           </option>
         </select>
       </div>
 
-      {/* Booking Date */}
+      {/* DATE + TIME */}
       <div>
-        <label className="block text-sm mb-1">
-          Booking Date
-        </label>
-
-        <input
-          type="text"
-          value={bookingDate}
-          onChange={(event) =>
-            setBookingDate(
-              event.target.value
-            )
-          }
-          placeholder="DD/MM/YYYY"
-          inputMode="numeric"
-          className="w-full border rounded p-2"
-          required
+        <FieldLabel
+          title="When?"
+          hint="Enter your preferred date and time"
         />
 
-        <p className="text-xs text-slate-500 mt-1">
-          Example: 15/10/2026
+        <div className="mt-3 grid gap-4 md:grid-cols-2">
+          <div>
+            <label className="text-xs font-medium text-slate-500">
+              Date
+            </label>
+
+            <input
+              type="text"
+              value={bookingDate}
+              onChange={(event) =>
+                setBookingDate(
+                  event.target.value
+                )
+              }
+              placeholder="DD/MM/YYYY"
+              inputMode="numeric"
+              className="mt-2 w-full rounded-2xl border border-white/10 bg-slate-950 px-4 py-3.5 text-white outline-none placeholder:text-slate-600 transition focus:border-white/30"
+              required
+            />
+          </div>
+
+          <div>
+            <label className="text-xs font-medium text-slate-500">
+              Time
+            </label>
+
+            <input
+              type="text"
+              value={bookingTime}
+              onChange={(event) =>
+                setBookingTime(
+                  event.target.value
+                )
+              }
+              placeholder="HH:MM"
+              inputMode="numeric"
+              className="mt-2 w-full rounded-2xl border border-white/10 bg-slate-950 px-4 py-3.5 text-white outline-none placeholder:text-slate-600 transition focus:border-white/30"
+              required
+            />
+          </div>
+        </div>
+
+        <p className="mt-2 text-xs text-slate-500">
+          Example: 15/10/2026 · 11:30
         </p>
       </div>
 
-      {/* Booking Time */}
-      <div>
-        <label className="block text-sm mb-1">
-          Booking Time
-        </label>
-
-        <input
-          type="text"
-          value={bookingTime}
-          onChange={(event) =>
-            setBookingTime(
-              event.target.value
-            )
-          }
-          placeholder="HH:MM"
-          inputMode="numeric"
-          className="w-full border rounded p-2"
-          required
-        />
-
-        <p className="text-xs text-slate-500 mt-1">
-          Example: 11:30
-        </p>
-      </div>
-
-      {/* Status */}
+      {/* STATUS */}
       {status && (
         <div
           className={
             status.type === "success"
-              ? "text-green-600"
-              : "text-red-600"
+              ? "rounded-2xl border border-emerald-400/20 bg-emerald-400/10 px-4 py-3 text-sm text-emerald-300"
+              : "rounded-2xl border border-red-400/20 bg-red-400/10 px-4 py-3 text-sm text-red-300"
           }
         >
           {status.message}
         </div>
       )}
 
-      {/* Submit */}
+      {/* SUBMIT */}
       <button
         type="submit"
-        disabled={isSubmitting}
-        className="px-4 py-2 rounded bg-slate-900 text-white disabled:opacity-50"
+        disabled={
+          isSubmitting ||
+          pets.length === 0 ||
+          addresses.length === 0 ||
+          providers.length === 0
+        }
+        className="w-full rounded-2xl bg-white px-6 py-4 text-sm font-bold text-slate-950 transition hover:bg-slate-200 disabled:cursor-not-allowed disabled:opacity-50"
       >
         {isSubmitting
-          ? "Creating..."
-          : "Create Booking"}
+          ? "Creating booking..."
+          : "Confirm Booking"}
       </button>
+
+      <p className="text-center text-xs text-slate-500">
+        Your booking will start as pending and can
+        then move through the care journey.
+      </p>
     </form>
+  );
+}
+
+function FieldLabel({
+  title,
+  hint,
+}: {
+  title: string;
+  hint: string;
+}) {
+  return (
+    <div>
+      <label className="text-sm font-semibold text-white">
+        {title}
+      </label>
+
+      <p className="mt-1 text-xs text-slate-500">
+        {hint}
+      </p>
+    </div>
   );
 }
