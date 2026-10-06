@@ -34,3 +34,51 @@ export interface UserAddressRow {
   is_default: boolean;
   created_at: string;
 }
+
+export interface BookingRow {
+  id: string;
+  user_id: string;
+  pet_id: string;
+  address_id: string;
+  provider_id: string;
+  service_type: string;
+  booking_date: string;
+  status: string;
+  created_at: string;
+
+  pets?: {
+    name: string;
+  };
+
+  user_addresses?: {
+    label: string;
+  };
+
+  service_providers?: {
+    name: string;
+    provider_type: string;
+    city: string;
+    rating: number;
+  };
+}
+
+export interface ServiceProviderRow {
+  id: string;
+  name: string;
+  email: string;
+  phone: string | null;
+  provider_type: string;
+  city: string;
+  rating: number;
+  is_verified: boolean;
+  created_at: string;
+}
+export interface ReviewRow {
+  id: string;
+  booking_id: string;
+  provider_id: string;
+  user_id: string;
+  rating: number;
+  review: string | null;
+  created_at: string;
+}
