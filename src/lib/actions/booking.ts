@@ -21,8 +21,10 @@ export async function createBookingRecord(
   const clerkUser = await currentUser();
 
   const userEmail =
-    clerkUser?.primaryEmailAddress?.emailAddress ??
-    clerkUser?.emailAddresses?.[0]?.emailAddress;
+    clerkUser?.primaryEmailAddress
+      ?.emailAddress ??
+    clerkUser?.emailAddresses?.[0]
+      ?.emailAddress;
 
   if (!userEmail) {
     return {
@@ -40,7 +42,8 @@ export async function createBookingRecord(
     return {
       success: false,
       error:
-        parsed.error.issues[0]?.message,
+        parsed.error.issues[0]
+          ?.message,
     };
   }
 
@@ -59,13 +62,22 @@ export async function createBookingRecord(
         .from("bookings")
         .insert({
           user_id: dbUser.id,
-          pet_id: parsed.data.pet_id,
+
+          provider_id:
+            parsed.data.provider_id,
+
+          pet_id:
+            parsed.data.pet_id,
+
           address_id:
             parsed.data.address_id,
+
           service_type:
             parsed.data.service_type,
+
           booking_date:
             parsed.data.booking_date,
+
           status: "pending",
         });
 

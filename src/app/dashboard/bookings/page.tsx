@@ -1,6 +1,7 @@
 import CancelBookingButton from "@/components/buttons/CancelBookingButton";
 import UpdateBookingStatusButton from "@/components/buttons/UpdateBookingStatusButton";
 import BookingForm from "@/components/forms/BookingForm";
+import ReviewForm from "@/components/forms/ReviewForm";
 import { auth, currentUser } from "@clerk/nextjs/server";
 import {
   getOrCreateUserSessionRow,
@@ -29,10 +30,8 @@ export default async function BookingsPage() {
   const clerkUser = await currentUser();
 
   const userEmail =
-    clerkUser?.primaryEmailAddress
-      ?.emailAddress ??
-    clerkUser?.emailAddresses?.[0]
-      ?.emailAddress;
+    clerkUser?.primaryEmailAddress?.emailAddress ??
+    clerkUser?.emailAddresses?.[0]?.emailAddress;
 
   if (!userEmail) {
     redirect("/sign-in");
@@ -62,6 +61,16 @@ export default async function BookingsPage() {
     providers =
       (await getServiceProviders()) ??
       [];
+
+    console.log(
+      "PROVIDERS COUNT:",
+      providers.length
+    );
+
+    console.log(
+      "PROVIDERS DATA:",
+      providers
+    );
 
     bookings =
       (await getUserBookings(
@@ -159,6 +168,19 @@ export default async function BookingsPage() {
                   <strong>Status:</strong>{" "}
                   {booking.status}
                 </p>
+
+                {booking.status ===
+                  "completed" &&
+                  booking.provider_id && (
+                    <ReviewForm
+                      bookingId={
+                        booking.id
+                      }
+                      providerId={
+                        booking.provider_id
+                      }
+                    />
+                  )}
 
                 {booking.status ===
                   "pending" && (

@@ -120,6 +120,16 @@ export async function getServiceProviders() {
         ascending: false,
       });
 
+  console.log(
+    "SERVICE PROVIDERS DATA:",
+    data
+  );
+
+  console.log(
+    "SERVICE PROVIDERS ERROR:",
+    error
+  );
+
   if (error) {
     console.error(error);
     return [];
